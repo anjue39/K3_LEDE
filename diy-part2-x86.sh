@@ -6,7 +6,7 @@
 # See /LICENSE for more information.
 #
 # https://github.com/P3TERX/Actions-OpenWrt
-# File name: diy-part2-x86-2.sh
+# File name: diy-part2-x86.sh
 # Description: OpenWrt DIY script part 2 (After Update feeds)
 # Description: 大部分是一开始不在默认底包，feeds update和自定义添加完后才有的 后设置
 
