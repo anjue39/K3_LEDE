@@ -6,7 +6,7 @@
 # See /LICENSE for more information.
 #
 # https://github.com/P3TERX/Actions-OpenWrt
-# File name: diy-part-x86-1.sh
+# File name: diy-part1-x86.sh
 # Description: OpenWrt DIY script part 1 (Before Update feeds)
 #
 
