@@ -34,10 +34,10 @@ rm -rf package/lean/luci-app-k3screenctrl
 git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
 echo '=========Add k3screen plug OK!========='
 
-echo '替换lwz322的K3屏幕驱动插件'
-rm -rf package/lean/k3screenctrl
-git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl/
-echo '=========Replace k3screen drive plug OK!========='
+# echo '替换lwz322的K3屏幕驱动插件'
+# rm -rf package/lean/k3screenctrl
+# git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl/
+# echo '=========Replace k3screen drive plug OK!========='
 
 echo '添加jerrykuku的argon-mod主题'
 rm -rf package/lean/luci-theme-argon  
@@ -86,7 +86,7 @@ echo '=========Remove benchmark display in index OK!========='
 # echo '=========Add theme OK!========='
 
 # echo 'K3专用，编译K3的时候只会出K3固件（去掉sed前面的#生效）'
-# sed -i 's|^TARGET_|# TARGET_|g; s|# TARGET_DEVICES += phicomm_k3|TARGET_DEVICES += phicomm_k3|' target/linux/bcm53xx/image/Makefile
+sed -i 's|^TARGET_|# TARGET_|g; s|# TARGET_DEVICES += phicomm_k3|TARGET_DEVICES += phicomm_k3|' target/linux/bcm53xx/image/Makefile
 # echo '=========Build K3 only OK!========='
 
 # Add a feed source
