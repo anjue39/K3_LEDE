@@ -34,7 +34,7 @@ sed -i 's/"USB 打印服务器"/"打印服务"/g' `grep "USB 打印服务器" -r
 sed -i 's/"Argon 主题设置"/"Argon设置"/g' `grep "Argon 主题设置" -rl ./`
 
 # echo 'K3专用，编译K3的时候只会出K3固件（去掉sed前面的#生效）'
-# sed -i 's|^TARGET_|# TARGET_|g; s|# TARGET_DEVICES += phicomm_k3|TARGET_DEVICES += phicomm_k3|' target/linux/bcm53xx/image/Makefile
+sed -i 's|^TARGET_|# TARGET_|g; s|# TARGET_DEVICES += phicomm_k3|TARGET_DEVICES += phicomm_k3|' target/linux/bcm53xx/image/Makefile
 # echo '=========Build K3 only OK!========='
 
 
