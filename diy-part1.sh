@@ -29,15 +29,15 @@ echo '=========Add a feed source OK!========='
 # rm -rf ./target-5.4.150.tar.gz
 # echo '=========Alert kernel to 5.4.150 OK!========='
 
-echo '添加lwz322的K3屏幕插件'
-rm -rf package/lean/luci-app-k3screenctrl
-git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
-echo '=========Add k3screen plug OK!========='
+# echo '添加lwz322的K3屏幕插件'
+# rm -rf package/lean/luci-app-k3screenctrl
+# git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
+# echo '=========Add k3screen plug OK!========='
 
-echo '替换lwz322的K3屏幕驱动插件'
-rm -rf package/lean/k3screenctrl
-git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl/
-echo '=========Replace k3screen drive plug OK!========='
+# echo '替换lwz322的K3屏幕驱动插件'
+# rm -rf package/lean/k3screenctrl
+# git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl/
+# echo '=========Replace k3screen drive plug OK!========='
 
 echo '添加jerrykuku的argon-mod主题'
 rm -rf package/lean/luci-theme-argon  
@@ -49,12 +49,12 @@ rm -rf package/lean/luci-app-argon-config
 git clone https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
 echo '=========Add argon-mod config OK!========='
 
-echo '移除bcm53xx中的其他机型'
-sed -i '421,453d' target/linux/bcm53xx/image/Makefile
-sed -i '140,412d' target/linux/bcm53xx/image/Makefile
-sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
-sed -n '140,146p' target/linux/bcm53xx/image/Makefile
-echo '=========Remove other devices of bcm53xx OK!========='
+# echo '移除bcm53xx中的其他机型'
+# sed -i '421,453d' target/linux/bcm53xx/image/Makefile
+# sed -i '140,412d' target/linux/bcm53xx/image/Makefile
+# sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
+# sed -n '140,146p' target/linux/bcm53xx/image/Makefile
+# echo '=========Remove other devices of bcm53xx OK!========='
 
 echo '移除主页跑分信息显示'
 sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
