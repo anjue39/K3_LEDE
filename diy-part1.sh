@@ -52,7 +52,7 @@ echo '=========Add argon-mod config OK!========='
 echo '移除bcm53xx中的其他机型'
 sed -i '140,435d' target/linux/bcm53xx/image/Makefile
 sed -i '444,476d' target/linux/bcm53xx/image/Makefile
-sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
+# sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
 # sed -n '140,146p' target/linux/bcm53xx/image/Makefile
 echo '=========Remove other devices of bcm53xx OK!========='
 
