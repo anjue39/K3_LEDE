@@ -69,6 +69,7 @@ echo '=========Remove benchmark display in index OK!========='
 # rm -rf feeds.buildinfo
 # rm -rf sha256sums
 # rm -rf version.buildinfo
+# rm -rf openwrt-bcm53xx-generic-phicomm_k3.manifest
 # rm -rf *.manifest
 # EOF
 
