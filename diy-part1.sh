@@ -46,7 +46,7 @@ echo '=========Add argon-mod OK!========='
 
 echo '添加jerrykuku的argon-mod主题自定义配置'
 rm -rf package/lean/luci-app-argon-config 
-git clone https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
+git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
 echo '=========Add argon-mod config OK!========='
 
 echo '移除bcm53xx中的其他机型'
