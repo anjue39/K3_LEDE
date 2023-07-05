@@ -8,7 +8,7 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 
-name: ad+ssrp+openclash+store
+name: ad+ssrp+openclash+store-diy
 
 on:
   repository_dispatch:
