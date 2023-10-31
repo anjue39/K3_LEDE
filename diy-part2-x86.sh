@@ -16,9 +16,9 @@
 # cat package/base-files/files/bin/config_generate |grep hostname=
 # echo '=========Alert hostname OK!========='
 
-# echo '修改路由器默认IP'
-# sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
-# echo '=========Alert default IP OK!========='
+echo '修改路由器默认IP'
+sed -i 's/192.168.1.1/192.168.10.1/g' package/base-files/files/bin/config_generate
+echo '=========Alert default IP OK!========='
 
 # 修改插件名字
 # sed -i 's/"aMule设置"/"电驴下载"/g' `grep "aMule设置" -rl ./`
@@ -32,6 +32,7 @@ sed -i 's/"USB 打印服务器"/"打印服务"/g' `grep "USB 打印服务器" -r
 # sed -i 's/"管理权"/"改密码"/g' `grep "管理权" -rl ./`
 # sed -i 's/"带宽监控"/"监控"/g' `grep "带宽监控" -rl ./`
 sed -i 's/"Argon 主题设置"/"Argon设置"/g' `grep "Argon 主题设置" -rl ./`
+sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
 
 
 # 以下是备用自定义配置，去'#'后才会执行，非必要不添加
