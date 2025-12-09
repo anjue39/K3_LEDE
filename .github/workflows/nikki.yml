@@ -1,103 +1,207 @@
 #
-# Phicomm K3 终极专用版 —— 2025.12.10 亲测 100% 成功（Ubuntu 24.04）
+# 基于原 P3TERX 模板修复版 —— 适配 Ubuntu 24.04 + K3 专用（2025.12）
 #
 name: nikki
 
 on:
-  workflow_dispatch
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
+  FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: nikki.config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
+  UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
+  UPLOAD_COWTRANSFER: false
+  UPLOAD_WETRANSFER: false
+  UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
 
 jobs:
   build:
-    runs-on: ubuntu-latest                     # 2025 年就是 Ubuntu 24.04
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      # ===================== Ubuntu 24.04 完全兼容依赖安装 =====================
-      - name: Install dependencies (Ubuntu 24.04)
-        run: |
-          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository universe -y
-          sudo add-apt-repository multiverse -y
-          sudo apt-get update
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo add-apt-repository universe -y  # 修复：启用 universe
+        sudo add-apt-repository multiverse -y  # 修复：启用 multiverse
+        sudo apt-get -qq update
+        # 修复：用 Lean 官方 Ubuntu 24.04 依赖列表（从文档复制，兼容 24.04）
+        sudo apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+          bzip2 ccache clang cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext \
+          genisoimage git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse3-dev libglib2.0-dev \
+          libgmp-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev \
+          libreadline-dev libssl-dev libtool llvm lrzsz libnsl-dev ninja-build p7zip p7zip-full patch pkgconf \
+          python3 python3-elftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion \
+          swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        # 修复：pip 安装 24.04 移除的包
+        python3 -m pip install --break-system-packages pyelftools
+        sudo apt-get -qq autoremove --purge
+        sudo apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
 
-          sudo apt-get install -y \
-            ack asciidoc autoconf automake autopoint binutils bison build-essential \
-            bzip2 ccache cmake cpio curl device-tree-compiler flex gawk \
-            gcc g++ git gperf help2man libelf-dev libfuse3-dev libglib2.0-dev \
-            libgmp-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libreadline-dev \
-            libssl-dev libtool lrzsz msmtp nano ninja-build p7zip-full patch pkg-config \
-            python3 python3-pip rsync scons squashfs-tools subversion swig texinfo \
-            uglifyjs upx-ucl unzip vim wget xorriso zlib1g-dev
+    - name: Clone source code
+      working-directory: /workdir
+      run: |
+        df -hT $PWD
+        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-          # Ubuntu 24.04 彻底移除的包，用 pip 安装
-          python3 -m pip install --break-system-packages pyelftools
+    - name: Load custom feeds
+      run: |
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
 
-          sudo apt-get clean
-          sudo timedatectl set-timezone "$TZ"
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
 
-      # ===================== 拉取 Lean 源码 =====================
-      - name: Clone source code
-        run: |
-          git clone --depth=1 $REPO_URL -b $REPO_BRANCH openwrt
-          ln -sf $(pwd)/openwrt $GITHUB_WORKSPACE/openwrt
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
 
-      # ===================== 添加插件 & feeds =====================
-      - name: Load custom feeds & plugins
-        run: |
-          [ -e feeds.conf.default ] && mv feeds.conf.default openwrt/feeds.conf.default
-          [ -e $DIY_P1_SH ] && bash $DIY_P1_SH || echo "no diy-part1.sh"
-          cd openwrt
-          ./scripts/feeds update -a
-          ./scripts/feeds install -a
+    - name: Load custom configuration
+      run: |
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x $DIY_P2_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P2_SH
 
-      # ===================== 加载配置 =====================
-      - name: Load config
-        run: |
-          [ -e files ] && mv files openwrt/files
-          [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-          [ -e $DIY_P2_SH ] && bash $DIY_P2_SH || echo "no diy-part2.sh"
-          cd openwrt
-          make defconfig
+    - name: SSH connection to Actions
+      uses: P3TERX/ssh2actions@v1.0.0
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
-      # ===================== 下载源码 =====================
-      - name: Download packages
-        run: |
-          cd openwrt
-          make download -j8 || true
-          find dl -size -1024c -exec rm -f {} \;
+    - name: Download package
+      id: package
+      run: |
+        cd openwrt
+        make defconfig
+        make download -j8
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
 
-      # ===================== 编译（单线程最稳）=====================
-      - name: Compile firmware
-        run: |
-          cd openwrt
-          echo "开始单线程编译（防止爆盘）"
-          make -j1 V=s
+    - name: Compile the firmware
+      id: compile
+      run: |
+        cd openwrt
+        echo "开始单线程编译（防爆盘）"
+        make -j1 V=s  # 修复：单线程，防止 24.04 磁盘满
+        echo "status=success" >> $GITHUB_OUTPUT  # 修复：新语法
+        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
+        [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
+        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
-      # ===================== K3 万能上传（兼容所有路径）=====================
-      - name: Upload K3 Firmware
-        uses: actions/upload-artifact@v4
-        with:
-          name: Phicomm_K3_${{ github.run_number }}_trx
-          path: |
-            openwrt/bin/targets/bcm53xx/generic/*phicomm_k3*.trx
-            openwrt/bin/*phicomm_k3*.trx
+    - name: Check space usage
+      if: (!cancelled())
+      run: df -hT
 
-      # ===================== 清理旧 workflow（可选）=====================
-      - name: Delete old workflow runs
-        uses: GitRML/delete-workflow-runs@main
-        with:
-          retain_days: 3
-          keep_minimum_runs: 5
+    - name: Upload bin directory
+      uses: actions/upload-artifact@v4
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      with:
+        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: openwrt/bin
+
+    - name: Organize files
+      id: organize
+      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      run: |
+        cd openwrt/bin
+        
+        # 修复：K3 万能路径兼容
+        if [ -d "targets" ]; then
+          cd targets/*/*
+          echo "使用标准路径"
+        elif ls *phicomm_k3*.trx 1>/dev/null 2>&1; then
+          echo "使用 K3 异常路径（已救活）"
+        else
+          echo "错误：没找到固件！"
+          ls -la
+          exit 1
+        fi
+        
+        rm -rf packages *.manifest config.buildinfo feeds.buildinfo sha256sums version.buildinfo 2>/dev/null || true
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT  # 修复：新语法
+
+    - name: Upload firmware directory
+      uses: actions/upload-artifact@v4
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: ${{ env.FIRMWARE }}
+
+    - name: Upload firmware to cowtransfer
+      id: cowtransfer
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
+      run: |
+        curl -fsSL git.io/file-transfer | sh
+        ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
+        echo "::warning file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
+        echo "url=$(cat cowtransfer.log | grep https | cut -f3 -d' ')" >> $GITHUB_OUTPUT  # 修复：新语法
+
+    - name: Upload firmware to WeTransfer
+      id: wetransfer
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
+      run: |
+        curl -fsSL git.io/file-transfer | sh
+        ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
+        echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+        echo "url=$(cat wetransfer.log | grep https | cut -f3 -d' ')" >> $GITHUB_OUTPUT  # 修复：新语法
+
+    - name: Generate release tag
+      id: tag
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      run: |
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT  # 修复：新语法
+        touch release.txt
+        [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
+        [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
+        echo "status=success" >> $GITHUB_OUTPUT  # 修复：新语法
+
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@v2
+      if: steps.tag.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        body_path: release.txt
+        files: ${{ env.FIRMWARE }}/*
+
+    - name: Delete workflow runs
+      uses: GitRML/delete-workflow-runs@main
+      with:
+        retain_days: 1
+        keep_minimum_runs: 3
+
+    - name: Remove old Releases
+      uses: dev-drprasad/delete-older-releases@v0.1.0
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        keep_latest: 3
+        delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
