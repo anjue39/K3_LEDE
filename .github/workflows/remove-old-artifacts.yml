@@ -1,0 +1,33 @@
+#
+# Copyright (c) 2019-2021 P3TERX <https://p3terx.com>
+#
+# This is free software, licensed under the MIT License.
+# See /LICENSE for more information.
+#
+# https://github.com/P3TERX/Actions-OpenWrt
+# File: .github/workflows/update-checker.yml
+# Description: Source code update checker
+#
+
+name: remove-old-artifacts
+
+env:
+  REPO_URL: https://github.com/anjue39/K3_LEDE
+  REPO_BRANCH: main
+
+on:
+  workflow_dispatch:
+#  schedule:
+#    - cron: 0 */18 * * *
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Delete workflow runs
+      uses: GitRML/delete-workflow-runs@main
+      with:
+        retain_days: 3
+        keep_minimum_runs: 3
