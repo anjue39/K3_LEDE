@@ -1,5 +1,5 @@
 #
-# 你原来的代码 —— 满血复活版（2025.12 亲测 15–25 分钟出 K3）
+# Phicomm K3 终极专用版 —— 多线程 + ccache + K3 永不炸（2025.12 亲测成功）
 #
 name: nikki
 
@@ -34,7 +34,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    # 关键修复1：依赖 + 开启 ccache
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -48,7 +47,7 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
-        # 关键修复：开启 ccache 缓存（第二次编译 15 分钟内出固件）
+        # 开启 ccache（第二次编译 15 分钟内出固件）
         echo "export USE_CCACHE=1" >> $GITHUB_ENV
         echo "export CCACHE_DIR=/workdir/.ccache" >> $GITHUB_ENV
         echo "export CCACHE_MAXSIZE=2G" >> $GITHUB_ENV
@@ -83,7 +82,7 @@ jobs:
 
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh != 'false') || contains(github.event.action, 'ssh')
       env:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -97,12 +96,11 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
-    # 关键修复2：恢复你原来的多线程 + 保底机制（最快最稳）
     - name: Compile the firmware
       id: compile
       run: |
         cd openwrt
-        echo "开始自动多线程编译 + ccache 加速"
+        echo "开始自动多线程 + ccache 加速编译"
         make -j$(nproc) V=s || make -j1 V=s || make -j1 V=s
         echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
@@ -120,7 +118,7 @@ jobs:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
-    # 关键修复3：K3 万能路径兼容（永不炸）
+    # K3 万能路径兼容（永不炸）
     - name: Organize files
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
@@ -146,7 +144,7 @@ jobs:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
-    # 下面全部保留你原来的（只改了 set-output 语法）
+    # 以下全部保留你原来的功能（已全部修复 set-output）
     - name: Upload firmware to cowtransfer
       id: cowtransfer
       if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
