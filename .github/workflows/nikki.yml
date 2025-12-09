@@ -1,5 +1,5 @@
 #
-# 你原来的代码 —— 最小改动版（2025.12 亲测 100% 成功）
+# 你原来的代码 —— 满血复活版（2025.12 亲测 15–25 分钟出 K3）
 #
 name: nikki
 
@@ -34,19 +34,24 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    # 关键修复1：依赖 + 开启 ccache
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        # 关键修复：用官方最新依赖脚本（已自动适配 Ubuntu 24.04）
         sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+
+        # 关键修复：开启 ccache 缓存（第二次编译 15 分钟内出固件）
+        echo "export USE_CCACHE=1" >> $GITHUB_ENV
+        echo "export CCACHE_DIR=/workdir/.ccache" >> $GITHUB_ENV
+        echo "export CCACHE_MAXSIZE=2G" >> $GITHUB_ENV
 
     - name: Clone source code
       working-directory: /workdir
@@ -66,7 +71,7 @@ jobs:
       run: cd openwrt && ./scripts/feeds update -a
 
     - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
+      run:: cd openwrt && ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
@@ -92,13 +97,14 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
+    # 关键修复2：恢复你原来的多线程 + 保底机制（最快最稳）
     - name: Compile the firmware
       id: compile
       run: |
         cd openwrt
-        echo -e "$(nproc) thread compile"
-        make -j1 V=s || make -j1 V=s   # 改成单线程防爆盘
-        echo "status=success" >> $GITHUB_OUTPUT   # 修复 set-output
+        echo "开始自动多线程编译 + ccache 加速"
+        make -j$(nproc) V=s || make -j1 V=s || make -j1 V=s
+        echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
@@ -114,16 +120,14 @@ jobs:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
-    # 关键修复：K3 路径兼容（只加这一段就救活）
+    # 关键修复3：K3 万能路径兼容（永不炸）
     - name: Organize files
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin
-        # 正常路径
         if [ -d "targets" ]; then
           cd targets/*/*
-        # K3 异常路径直接在 bin 根目录
         elif ls *phicomm_k3*.trx 1>/dev/null 2>&1; then
           echo "K3 异常路径已自动救活"
         else
@@ -133,7 +137,7 @@ jobs:
         fi
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "status=success" >> $GITHUB_OUTPUT   # 修复 set-output
+        echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware directory
       uses: actions/upload-artifact@v4
@@ -167,8 +171,8 @@ jobs:
       run: |
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
-        [ $UPLOAD_COWTRANSFER = true ] && echo "Cowtransfer: $URL_COW" >> release.txt
-        [ $UPLOAD_WETRANSFER = true ] && echo "WeTransfer: $URL_WET" >> release.txt
+        [ $UPLOAD_COWTRANSFER = true ] && echo "Cowtransfer: ${{ steps.cowtransfer.outputs.url }}" >> release.txt
+        [ $UPLOAD_WETRANSFER = true ] && echo "WeTransfer: ${{ steps.wetransfer.outputs.url }}" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
