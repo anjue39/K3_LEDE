@@ -49,12 +49,12 @@ rm -rf package/lean/luci-app-argon-config
 git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
 echo '=========Add argon-mod config OK!========='
 
-echo '移除bcm53xx中的其他机型'
-sed -i '539,571d' target/linux/bcm53xx/image/Makefile
-sed -i '168,530d' target/linux/bcm53xx/image/Makefile
+# echo '移除bcm53xx中的其他机型'
+# sed -i '539,571d' target/linux/bcm53xx/image/Makefile
+# sed -i '168,530d' target/linux/bcm53xx/image/Makefile
 # sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
-sed -n '532,538p' target/linux/bcm53xx/image/Makefile
-echo '=========Remove other devices of bcm53xx OK!========='
+# sed -n '532,538p' target/linux/bcm53xx/image/Makefile
+# echo '=========Remove other devices of bcm53xx OK!========='
 
 # ======== 强制只编译 K3 并生成完整固件（必须用这个完整版！） ========
 #cat > target/linux/bcm53xx/image/Makefile <<'EOF'
