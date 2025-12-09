@@ -56,6 +56,25 @@ echo '=========Add argon-mod config OK!========='
 #sed -n '532,538p' target/linux/bcm53xx/image/Makefile
 #echo '=========Remove other devices of bcm53xx OK!========='
 
+# ======== 强制只编译 K3 并生成完整固件（必须用这个完整版！） ========
+#cat > target/linux/bcm53xx/image/Makefile <<'EOF'
+#define Device/phicomm-k3
+#  DEVICE_VENDOR := Phicomm
+#  DEVICE_MODEL := K3
+#  SOC := bcm4709
+#  DEVICE_DTS_CONFIG := config@cv1812cp
+#  IMAGE_SIZE := 128m
+#  IMAGES := trx
+#  DEVICE_PACKAGES := kmod-brcmfmac kmod-brcmfmac_4366c0 firmware-brcmfmac4366c-pcie \
+#                     kmod-usb3 kmod-usb-ledtrig-usbport \
+#                     k3screenctrl luci-app-k3screenctrl luci-app-argon-config
+#  KERNEL := kernel-bin | lzma | fit lzma \$KERNEL
+#  KERNEL_INITRAMFS := kernel-bin | lzma | fit lzma \$KERNEL_INITRAMFS
+#  IMAGE/trx := append-kernel | pad-to 64k | append-rootfs | pad-rootfs | append-metadata
+#endef
+#TARGET_DEVICES += phicomm-k3
+#EOF
+
 
 echo '移除主页跑分信息显示'
 sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
