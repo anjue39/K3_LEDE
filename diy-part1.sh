@@ -48,7 +48,6 @@ echo '=========Add argon-mod config OK!========='
 
 # 3. 从源码最根源改 K3 的 DEVICE_PACKAGES（你测试有效的版本）
 #    官方以后怎么改都没用，你永远是你想要的这行！
-sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac k3wifi $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
 echo '移除bcm53xx中的其他机型'
 sed -i '539,571d' target/linux/bcm53xx/image/Makefile
 sed -i '168,530d' target/linux/bcm53xx/image/Makefile
