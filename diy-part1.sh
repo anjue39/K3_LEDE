@@ -46,8 +46,9 @@ rm -rf package/lean/luci-app-argon-config
 git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
 echo '=========Add argon-mod config OK!========='
 
-# 3. 从源码最根源改 K3 的 DEVICE_PACKAGES（你测试有效的版本）
-#    官方以后怎么改都没用，你永远是你想要的这行！
+# 删除标准固件包，避免冲突
+sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
+
 echo '移除bcm53xx中的其他机型'
 sed -i '539,571d' target/linux/bcm53xx/image/Makefile
 sed -i '168,530d' target/linux/bcm53xx/image/Makefile
