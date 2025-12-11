@@ -1,55 +1,47 @@
 #!/bin/bash
-#
+echo "K3 专用修复版 —— 永不卡条+WiFi满血"
+
 # Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
-#
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
 # https://github.com/P3TERX/Actions-OpenWrt
 # File name: diy-part1.sh
 # Description: OpenWrt DIY script part 1 (Before Update feeds)
-#
 
-# Uncomment a feed source
-#sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
 
 echo '添加自定义源'
-# sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
-# sed -i '$a src-git small https://github.com/kenzok8/small-package' feeds.conf.default
+sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
 sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
 sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
+# sed -i '$a src-git small https://github.com/kenzok8/small-package' feeds.conf.default
 # sed -i '$a src-git openclash https://github.com/vernesong/OpenClash' feeds.conf.default
 # sed -i '$a src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' feeds.conf.default
 echo '=========Add a feed source OK!========='
 
-# echo '修改5.4分支为5.4.150'
-# sed -i '/^LINUX_VERSION-5.4/c LINUX_VERSION-5.4 = .150' include/kernel-version.mk
-# sed -i '/^LINUX_KERNEL_HASH-5.4/c LINUX_KERNEL_HASH-5.4.150 = f424a9bbb05007f04c17f96a2e4f041a8001554a9060d2c291606e8a97c62aa2' include/kernel-version.mk
-# wget -nv https://github.com/yangxu52/OP-old-kernel-target/raw/main/target-5.4.150.tar.gz
-# rm -rf ./target/
-# tar -zxf ./target-5.4.150.tar.gz
-# rm -rf ./target-5.4.150.tar.gz
-# echo '=========Alert kernel to 5.4.150 OK!========='
+echo '添加jerrykuku的argon主题及设置'
+rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
+git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
+git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
+echo '=========Add argon OK!========='
 
-# 覆盖官方最新屏幕插件（名字最标准，永不冲突）
+echo '移除主页跑分信息显示'
+sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
+echo '=========Remove benchmark display in index OK!========='
+
+
+# ================以下备用，多以失效，按顺序最上为最有效====================
+# echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
+# 但好像用不到了，尤其更新内核后，lede最近更新了一个phicomm-k3screenctrl，等同于k3screenctl和luci-app-k3screenctrl的合体
+# menuconfig后台luci里默认勾选luci-app-k3screenctrl，utilties就自动锁死勾选了配套的phicomm-k3screenctrl，这才是配套的组合，编译才会成功
 # rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
 # git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
 # git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
 
-echo '添加jerrykuku的argon-mod主题'
-rm -rf package/lean/luci-theme-argon  
-git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
-echo '=========Add argon-mod OK!========='
-
-echo '添加jerrykuku的argon-mod主题自定义配置'
-rm -rf package/lean/luci-app-argon-config 
-git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
-echo '=========Add argon-mod config OK!========='
-
-# 删除标准固件包，避免冲突
+# 删除标准固件包，避免冲突。如果你想用k3wifi，那么就得删除BRCMFMAC_4366C0，因为k3wifi里面已经包含
 # sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
 
-echo '移除bcm53xx中的其他机型'
+# echo '移除bcm53xx中的其他机型，lede最新版本适配你设置的单机型，而不是生成所有，此代码没必要了'
 # sed -i '539,571d' target/linux/bcm53xx/image/Makefile
 # sed -i '168,530d' target/linux/bcm53xx/image/Makefile
 # sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
@@ -58,7 +50,7 @@ echo '移除bcm53xx中的其他机型'
 # sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac k3wifi $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
 # sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
 # sed -n '532,539p' target/linux/bcm53xx/image/Makefile
-echo '=========Remove other devices of bcm53xx OK!========='
+# echo '=========Remove other devices of bcm53xx OK!========='
 
 # ======== 强制只编译 K3 并生成完整固件（必须用这个完整版！） ========
 #cat > target/linux/bcm53xx/image/Makefile <<'EOF'
@@ -80,12 +72,6 @@ echo '=========Remove other devices of bcm53xx OK!========='
 #EOF
 
 
-echo '移除主页跑分信息显示'
-sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
-echo '=========Remove benchmark display in index OK!========='
-
-
-
 # 整理固件包时候,删除您不想要的固件或者文件,让它不需要上传到Actions空间（根据编译机型变化,自行调整需要删除的固件名称）
 # cat >${GITHUB_WORKSPACE}/Clear <<-EOF
 # rm -rf config.buildinfo
@@ -96,12 +82,19 @@ echo '=========Remove benchmark display in index OK!========='
 # rm -rf *.manifest
 # EOF
 
-
 # echo '临时替换kernel＜5.10，解决编译问题，等上游修复'
 # rm -rf package/kernel
 # git clone https://github.com/anjue39/kernel package/kernel
 # echo '=========Add kernel hack patch OK!========='
 
+# echo '修改5.4分支为5.4.150'
+# sed -i '/^LINUX_VERSION-5.4/c LINUX_VERSION-5.4 = .150' include/kernel-version.mk
+# sed -i '/^LINUX_KERNEL_HASH-5.4/c LINUX_KERNEL_HASH-5.4.150 = f424a9bbb05007f04c17f96a2e4f041a8001554a9060d2c291606e8a97c62aa2' include/kernel-version.mk
+# wget -nv https://github.com/yangxu52/OP-old-kernel-target/raw/main/target-5.4.150.tar.gz
+# rm -rf ./target/
+# tar -zxf ./target-5.4.150.tar.gz
+# rm -rf ./target-5.4.150.tar.gz
+# echo '=========Alert kernel to 5.4.150 OK!========='
 
 # mkdir -p files/etc/hotplug.d/block && curl -fsSL https://raw.githubusercontent.com/281677160/openwrt-package/usb/block/10-mount > files/etc/hotplug.d/block/10-mount
 
