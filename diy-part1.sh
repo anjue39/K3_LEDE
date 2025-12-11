@@ -31,14 +31,10 @@ echo '=========Add a feed source OK!========='
 # rm -rf ./target-5.4.150.tar.gz
 # echo '=========Alert kernel to 5.4.150 OK!========='
 
-echo '添加lwz322的K3屏幕插件'
-rm -rf package/lean/luci-app-k3screenctrl
+# 覆盖官方最新屏幕插件（名字最标准，永不冲突）
+rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
+git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
 git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
-echo '=========Add k3screen plug OK!========='
-
-echo '替换lwz322的K3屏幕驱动插件'
-git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl/
-echo '=========Replace k3screen drive plug OK!========='
 
 echo '添加jerrykuku的argon-mod主题'
 rm -rf package/lean/luci-theme-argon  
@@ -82,10 +78,6 @@ echo '=========Remove other devices of bcm53xx OK!========='
 #endef
 #TARGET_DEVICES += phicomm-k3
 #EOF
-
-echo '额外加上你必须的插件（官方原始定义不带这些）'
-sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3wifi k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
-# DEVICE_PACKAGES := $(BRCMFMAC_4366C0) $(USB3_PACKAGES) + k3wifi + k3screenctrl
 
 
 echo '移除主页跑分信息显示'
