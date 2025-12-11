@@ -37,8 +37,6 @@ git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luc
 echo '=========Add k3screen plug OK!========='
 
 echo '替换lwz322的K3屏幕驱动插件'
-rm -rf package/lean/k3screenctrl
-rm -rf ../packages/utils/phicomm-k3screenctrl
 git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl/
 echo '=========Replace k3screen drive plug OK!========='
 
@@ -52,11 +50,17 @@ rm -rf package/lean/luci-app-argon-config
 git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
 echo '=========Add argon-mod config OK!========='
 
+# 3. 从源码最根源改 K3 的 DEVICE_PACKAGES（你测试有效的版本）
+#    官方以后怎么改都没用，你永远是你想要的这行！
+sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac k3wifi $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
 echo '移除bcm53xx中的其他机型'
 sed -i '539,571d' target/linux/bcm53xx/image/Makefile
 sed -i '168,530d' target/linux/bcm53xx/image/Makefile
 # sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
-sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
+# 从源码最根源改 K3 的 DEVICE_PACKAGES（你测试有效的版本）
+# 官方以后怎么改都没用，你永远是你想要的这行！
+sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac k3wifi $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
+# sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
 sed -n '532,539p' target/linux/bcm53xx/image/Makefile
 echo '=========Remove other devices of bcm53xx OK!========='
 
@@ -82,7 +86,6 @@ echo '=========Remove other devices of bcm53xx OK!========='
 echo '额外加上你必须的插件（官方原始定义不带这些）'
 sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3wifi k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
 # DEVICE_PACKAGES := $(BRCMFMAC_4366C0) $(USB3_PACKAGES) + k3wifi + k3screenctrl
-
 
 
 echo '移除主页跑分信息显示'
