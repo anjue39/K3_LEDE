@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_URL: git clone https://github.com/coolsnowwolf/lede.git && cd lede && git checkout dc4d37c71423bd48b02f614414b149fa192d3406
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: nikki.config
