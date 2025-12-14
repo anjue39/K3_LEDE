@@ -48,7 +48,7 @@ echo '=========Remove benchmark display in index OK!========='
 # sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
 # 从源码最根源改 K3 的 DEVICE_PACKAGES（你测试有效的版本）
 # 官方以后怎么改都没用，你永远是你想要的这行！
-sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
+# sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
 # sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
 # sed -n '532,539p' target/linux/bcm53xx/image/Makefile
 # echo '=========Remove other devices of bcm53xx OK!========='
