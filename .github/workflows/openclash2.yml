@@ -21,8 +21,8 @@ env:
   SOURCE_COMMIT: dc4d37c71423bd48b02f614414b149fa192d3406   # ← 如果想用最新版，直接注释或删掉这行或留空即可
   # SOURCE_COMMIT: ''   # 这样写就是强制用最新版
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: openclash.config
-  DIY_P1_SH: diy-part3.sh
+  CONFIG_FILE: openclash+ipsec.config
+  DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
