@@ -17,7 +17,7 @@ sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf
 # sed -i '$a src-git small https://github.com/kenzok8/small-package' feeds.conf.default
 # sed -i '$a src-git openclash https://github.com/vernesong/OpenClash' feeds.conf.default
 # sed -i '$a src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' feeds.conf.default
-sed -i '$a src-git ECH https://github.com/SunshineList/luci-app-ech-workers' feeds.conf.default
+# sed -i '$a src-git ECH https://github.com/SunshineList/luci-app-ech-workers' feeds.conf.default
 echo '=========Add a feed source OK!========='
 
 echo '添加jerrykuku的argon主题及设置'
