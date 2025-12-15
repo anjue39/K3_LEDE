@@ -11,12 +11,12 @@ echo "K3 专用修复版 — 永不卡条+WiFi满血"
 
 
 echo '添加自定义源'
-sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
-sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
-sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
+# sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
+# sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
+# sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
 # sed -i '$a src-git small https://github.com/kenzok8/small-package' feeds.conf.default
-# sed -i '$a src-git openclash https://github.com/vernesong/OpenClash' feeds.conf.default
-# sed -i '$a src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' feeds.conf.default
+sed -i '$a src-git openclash https://github.com/vernesong/OpenClash' feeds.conf.default
+sed -i '$a src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' feeds.conf.default
 # sed -i '$a src-git ECH https://github.com/SunshineList/luci-app-ech-workers' feeds.conf.default
 echo '=========Add a feed source OK!========='
 
