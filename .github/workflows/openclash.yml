@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: openclash2
+name: openclash
 
 on:
   repository_dispatch:
@@ -18,11 +18,11 @@ on:
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
-  SOURCE_COMMIT: dc4d37c71423bd48b02f614414b149fa192d3406   # ← 如果想用最新版，直接注释或删掉这行或留空即可
+  SOURCE_COMMIT: f8b9349cb8e1722bde2730bf23236e7310319314   #无问题5.4内核稳定版本 ← 如果想用最新版，直接注释或删掉这行或留空即可
   # SOURCE_COMMIT: ''   # 这样写就是强制用最新版
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: openclash.config
-  DIY_P1_SH: diy-part3.sh
+  DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
