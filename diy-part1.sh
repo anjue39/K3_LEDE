@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "K3 专用修复版 —— 永不卡条+WiFi满血"
+echo "K3 专用修复版 — 永不卡条+WiFi满血"
 
 # Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
 # This is free software, licensed under the MIT License.
