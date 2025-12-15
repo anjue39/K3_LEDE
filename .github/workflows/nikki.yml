@@ -10,17 +10,18 @@
 # See /LICENSE for more information.
 #
 
-name: nikki
+name: openclash
 
 on:
   repository_dispatch:
   workflow_dispatch:
 
 env:
-  REPO_URL: git clone https://github.com/coolsnowwolf/lede.git && cd lede && git checkout dc4d37c71423bd48b02f614414b149fa192d3406
-  REPO_BRANCH: master
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  SOURCE_COMMIT: f8b9349cb8e1722bde2730bf23236e7310319314   #无问题5.4内核稳定版本 ← 如果想用最新版，直接注释或删掉这行或留空即可
+  # SOURCE_COMMIT: ''   # 这样写就是强制用最新版
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: nikki.config
+  CONFIG_FILE: openclash.config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: false
@@ -30,7 +31,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
@@ -40,10 +41,9 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-        sudo docker image prune --all --force
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -54,7 +54,19 @@ jobs:
       working-directory: /workdir
       run: |
         df -hT $PWD
-        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        
+        # 如果 SOURCE_COMMIT 为空或未定义，则克隆最新版（master）
+        if [ -z "${{ env.SOURCE_COMMIT }}" ]; then
+          echo "SOURCE_COMMIT 未设置，使用最新版（master）"
+          git clone --depth=1 ${{ env.REPO_URL }} openwrt
+        else
+          echo "使用指定 commit: ${{ env.SOURCE_COMMIT }}"
+          # 下载指定 commit 的 tarball（最快、无历史）
+          curl -L https://github.com/coolsnowwolf/lede/archive/${{ env.SOURCE_COMMIT }}.tar.gz | tar -xz
+          # 解压后目录名为 lede-<sha>，统一重命名为 openwrt
+          mv lede-${{ env.SOURCE_COMMIT }} openwrt
+        fi
+        
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Load custom feeds
@@ -138,6 +150,7 @@ jobs:
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
         [ ${UPLOAD_GOFILE} = true && ${{ steps.gofile.outputs.url }} ] && echo "🔗 [GoFile](${{ steps.gofile.outputs.url }})" >> release.txt
+
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
@@ -153,8 +166,8 @@ jobs:
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main
       with:
-        retain_days: 0
-        keep_minimum_runs: 2
+        retain_days: 1
+        keep_minimum_runs: 3
 
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@master
