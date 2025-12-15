@@ -30,28 +30,30 @@ echo '移除主页跑分信息显示'
 sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
 echo '=========Remove benchmark display in index OK!========='
 
-
-# ================以下备用，多以失效，按顺序最上为最有效====================
-# echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
-# 但好像用不到了，尤其更新内核后，lede最近更新了一个phicomm-k3screenctrl，等同于k3screenctl和luci-app-k3screenctrl的合体
-# menuconfig后台luci里默认勾选luci-app-k3screenctrl，utilties就自动锁死勾选了配套的phicomm-k3screenctrl，这才是配套的组合，编译才会成功
-# rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
-# git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
-# git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
+echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
+rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
+git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
+git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
+echo '=========Add k3screen plug OK!========='
 
 # 删除标准固件包，避免冲突。如果你想用k3wifi，那么就得删除BRCMFMAC_4366C0，因为k3wifi里面已经包含
 # sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
 
-# echo '移除bcm53xx中的其他机型，lede最新版本适配你设置的单机型，而不是生成所有，此代码没必要了'
-# sed -i '539,571d' target/linux/bcm53xx/image/Makefile
-# sed -i '168,530d' target/linux/bcm53xx/image/Makefile
+echo '移除bcm53xx中的其他机型，lede最新版本适配你设置的单机型，而不是生成所有，此代码没必要了'
+# sed -i '421,453d' target/linux/bcm53xx/image/Makefile
+# sed -i '140,412d' target/linux/bcm53xx/image/Makefile
 # sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
 # 从源码最根源改 K3 的 DEVICE_PACKAGES（你测试有效的版本）
-# 官方以后怎么改都没用，你永远是你想要的这行！
-# sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
+# 下面这行指定编译固件封装锁死的插件！
+# sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac k3wifi $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
+# 下面这行只生成k3这个设备的固件！
+sed -i '/define Device\/phicomm_k3/,/TARGET_DEVICES += phicomm_k3/!{ /define Device\//,/endef/d; /TARGET_DEVICES +=/d }' target/linux/bcm53xx/image/Makefile
 # sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
-# sed -n '532,539p' target/linux/bcm53xx/image/Makefile
-# echo '=========Remove other devices of bcm53xx OK!========='
+# sed -n '532,538p' target/linux/bcm53xx/image/Makefile
+echo '=========Remove other devices of bcm53xx OK!========='
+
+
+# ================以下备用，多以失效，按顺序最上为最有效====================
 
 # ======== 强制只编译 K3 并生成完整固件（必须用这个完整版！） ========
 #cat > target/linux/bcm53xx/image/Makefile <<'EOF'
