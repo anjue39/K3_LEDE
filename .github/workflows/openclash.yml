@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: openclash
+name: openclash2
 
 on:
   repository_dispatch:
@@ -18,10 +18,11 @@ on:
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
+  SOURCE_COMMIT: dc4d37c71423bd48b02f614414b149fa192d3406   # ← 如果想用最新版，直接注释或删掉这行或留空即可
+  # SOURCE_COMMIT: ''   # 这样写就是强制用最新版
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: openclash.config
-  DIY_P1_SH: diy-part1.sh
+  DIY_P1_SH: diy-part3.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
@@ -53,7 +54,19 @@ jobs:
       working-directory: /workdir
       run: |
         df -hT $PWD
-        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        
+        # 如果 SOURCE_COMMIT 为空或未定义，则克隆最新版（master）
+        if [ -z "${{ env.SOURCE_COMMIT }}" ]; then
+          echo "SOURCE_COMMIT 未设置，使用最新版（master）"
+          git clone --depth=1 ${{ env.REPO_URL }} openwrt
+        else
+          echo "使用指定 commit: ${{ env.SOURCE_COMMIT }}"
+          # 下载指定 commit 的 tarball（最快、无历史）
+          curl -L https://github.com/coolsnowwolf/lede/archive/${{ env.SOURCE_COMMIT }}.tar.gz | tar -xz
+          # 解压后目录名为 lede-<sha>，统一重命名为 openwrt
+          mv lede-${{ env.SOURCE_COMMIT }} openwrt
+        fi
+        
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Load custom feeds
