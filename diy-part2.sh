@@ -10,10 +10,6 @@
 # Description: OpenWrt DIY script part 2 (After Update feeds)
 # Description: 大部分是一开始不在默认底包，feeds update和自定义添加完后才有的 后设置
 
-#!/bin/bash
-# 只加这1行：强制切到 LEDE 源码根目录（适配 GitHub Actions/本地）
-cd "${GITHUB_WORKSPACE:-$PWD}/openwrt" || exit 1
-
 # 以下是你原封不动的代码（完全不用改）
 echo '修改主机名'
 sed -i "s/hostname='LEDE'/hostname='PHICOMM'/g" package/base-files/files/bin/config_generate
