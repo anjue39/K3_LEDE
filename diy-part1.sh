@@ -1,40 +1,28 @@
 #!/bin/bash
-echo "K3 专用修复版 — 永不卡条+WiFi满血"
 
-# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
-# This is free software, licensed under the MIT License.
-# See /LICENSE for more information.
-#
-# https://github.com/P3TERX/Actions-OpenWrt
-# File name: diy-part1.sh
-# Description: OpenWrt DIY script part 1 (Before Update feeds)
+echo -e "\n===== 开始执行 diy-part1.sh（feeds update 前配置）=====\n"
 
+# ====================== 1. 屏蔽官方 feeds 中的重复包（源头杜绝拉取） ======================
+echo "🔧 屏蔽官方 feeds 中的目标包..."
+# 屏蔽 feeds/packages 中的 phicomm-k3screenctrl
+sed -i '/packages/ s/$/ --exclude=phicomm-k3screenctrl/' scripts/feeds
+# 屏蔽 feeds/luci 中的冲突包
+sed -i '/luci/ s/$/ --exclude=luci-app-openclash --exclude=luci-app-k3screenctrl --exclude=luci-theme-argon --exclude=luci-app-nikki/' scripts/feeds
 
-echo '添加自定义源'
-# sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
-# sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
-# sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
-# sed -i '$a src-git small https://github.com/kenzok8/small-package' feeds.conf.default
-sed -i '$a src-git openclash https://github.com/vernesong/OpenClash' feeds.conf.default
-sed -i '$a src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' feeds.conf.default
-# sed -i '$a src-git ECH https://github.com/SunshineList/luci-app-ech-workers' feeds.conf.default
-echo '=========Add a feed source OK!========='
+# ====================== 2. 配置自定义 feeds 源（openclash + nikki） ======================
+echo -e "\n🔧 配置自定义 feeds 源..."
+# 先删除已存在的同名 feeds 配置（避免重复添加）
+sed -i '/openclash/d' feeds.conf.default
+sed -i '/nikki/d' feeds.conf.default
+# 添加自定义 feeds 到配置文件末尾
+echo 'src-git openclash https://github.com/vernesong/OpenClash' >> feeds.conf.default
+echo 'src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' >> feeds.conf.default
 
-#echo '添加jerrykuku的argon主题及设置'
-#rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
-#git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
-#git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
-#echo '=========Add argon OK!========='
+# ====================== 3. 可选：注释官方无用 feeds（如需精简，取消下面注释） ======================
+# echo -e "\n🔧 精简官方 feeds..."
+# sed -i 's/^src-git telephony/#&/' feeds.conf.default
 
-echo '移除主页跑分信息显示'
-sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
-echo '=========Remove benchmark display in index OK!========='
-
-echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
-rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
-git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
-git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
-echo '=========Add k3screen plug OK!========='
+echo -e "\n===== diy-part1.sh 执行完成 =====\n"
 
 # 删除标准固件包，避免冲突。如果你想用k3wifi，那么就得删除BRCMFMAC_4366C0，因为k3wifi里面已经包含
 # sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
