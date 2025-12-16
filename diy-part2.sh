@@ -12,12 +12,15 @@
 
 
 echo '修改主机名'
-sed -i "s/hostname='OpenWrt'/hostname='PHICOMM'/g" package/base-files/files/bin/config_generate
+sed -i "s/hostname='LEDE'/hostname='PHICOMM'/g" package/base-files/files/bin/config_generate
 cat package/base-files/files/bin/config_generate |grep hostname=
 echo '=========Alert hostname OK!========='
 
 echo '修改路由器默认IP'
-sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
+sed -i -e 's/192\.168\.1\.1/192.168.2.1/g' \
+       -e 's/"192\.168\.1\.1"/"192.168.2.1"/g' \
+       -e "s/'192\.168\.1\.1'/'192.168.2.1'/g" \
+       package/base-files/files/bin/config_generate
 echo '=========Alert default IP OK!========='
 
 # 修改插件名字
