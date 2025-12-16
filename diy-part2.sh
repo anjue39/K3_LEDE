@@ -1,14 +1,55 @@
 #!/bin/bash
-#
-# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
-#
-# This is free software, licensed under the MIT License.
-# See /LICENSE for more information.
-#
-# https://github.com/P3TERX/Actions-OpenWrt
-# File name: diy-part2.sh
-# Description: OpenWrt DIY script part 2 (After Update feeds)
-# Description: 大部分是一开始不在默认底包，feeds update和自定义添加完后才有的 后设置
+
+echo -e "\n===== 开始执行 diy-part2.sh（feeds install 后处理）=====\n"
+
+# ====================== 1. 清理 feeds 残留和重复包 ======================
+echo "🔧 清理 feeds 残留包..."
+# 清理 feeds 目录下的冲突包
+rm -rf feeds/packages/net/phicomm-k3screenctrl 2>/dev/null
+rm -rf feeds/luci/applications/luci-app-openclash 2>/dev/null
+rm -rf feeds/luci/applications/luci-app-k3screenctrl 2>/dev/null
+rm -rf feeds/luci/themes/luci-theme-argon 2>/dev/null
+rm -rf feeds/luci/applications/luci-app-nikki 2>/dev/null
+
+# 清理 package/feeds 下的软链接
+rm -rf package/feeds/packages/phicomm-k3screenctrl 2>/dev/null
+rm -rf package/feeds/luci/luci-app-openclash 2>/dev/null
+rm -rf package/feeds/luci/luci-app-k3screenctrl 2>/dev/null
+rm -rf package/feeds/luci/luci-theme-argon 2>/dev/null
+rm -rf package/feeds/luci/luci-app-nikki 2>/dev/null
+
+# ====================== 2. 清理 package/lean 中的旧包 ======================
+echo -e "\n🔧 清理 package/lean 旧包..."
+rm -rf package/lean/phicomm-k3screenctrl 2>/dev/null
+rm -rf package/lean/luci-app-openclash 2>/dev/null
+rm -rf package/lean/luci-app-k3screenctrl 2>/dev/null
+rm -rf package/lean/luci-theme-argon 2>/dev/null
+rm -rf package/lean/luci-app-argon-config 2>/dev/null
+rm -rf package/lean/luci-app-nikki 2>/dev/null
+rm -rf package/lean/k3screenctrl 2>/dev/null
+
+# ====================== 3. 安装自定义 feeds 包（openclash + nikki） ======================
+echo -e "\n🔧 安装自定义 feeds 包..."
+./scripts/feeds update openclash nikki
+./scripts/feeds install -a -p openclash
+./scripts/feeds install -a -p nikki
+
+# ====================== 4. 手动克隆高优先级包（argon + k3screenctrl） ======================
+echo -e "\n🔧 手动克隆自定义包到 package/lean..."
+# 克隆 argon 主题 + 配置
+git clone -b 18.06 --depth=1 https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
+git clone -b 18.06 --depth=1 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
+
+# 克隆 k3screenctrl 主程序 + luci 控制界面
+git clone --depth=1 https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
+git clone --depth=1 https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
+
+# ====================== 5. 可选：将 feeds 包迁移到 package/lean 提升优先级（如需，取消注释） ======================
+# echo -e "\n🔧 提升 feeds 包优先级..."
+# cp -rf package/feeds/openclash/* package/lean/ 2>/dev/null
+# cp -rf package/feeds/nikki/* package/lean/ 2>/dev/null
+
+echo -e "\n===== diy-part2.sh 执行完成 =====\n"
 
 echo '修改主机名'
 sed -i "s/hostname='OpenWrt'/hostname='PHICOMM'/g" package/base-files/files/bin/config_generate
