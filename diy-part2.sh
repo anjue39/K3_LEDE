@@ -52,7 +52,7 @@ git clone --depth=1 https://github.com/yangxu52/luci-app-k3screenctrl.git packag
 echo -e "\n===== diy-part2.sh 执行完成 =====\n"
 
 echo '修改主机名'
-sed -i "s/hostname='OpenWrt'/hostname='PHICOMM'/g" package/base-files/files/bin/config_generate
+sed -i "s/hostname='LEDE'/hostname='PHICOMM'/g" package/base-files/files/bin/config_generate
 cat package/base-files/files/bin/config_generate |grep hostname=
 echo '=========Alert hostname OK!========='
 
