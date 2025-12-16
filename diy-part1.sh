@@ -7,7 +7,7 @@ echo "🔧 屏蔽官方 feeds 中的重复包..."
 # 给 feeds/packages 源追加屏蔽参数
 sed -i '/src-git packages/ s/$/ --exclude=phicomm-k3screenctrl/' feeds.conf.default
 # 给 feeds/luci 源追加屏蔽参数
-sed -i '/src-git luci/ s/$/ --exclude=luci-app-openclash --exclude=luci-app-k3screenctrl --exclude=luci-theme-argon --exclude=luci-app-nikki/' feeds.conf.default
+sed -i '/src-git luci/ s/$/ --exclude=luci-app-openclash --exclude=luci-app-k3screenctrl --exclude=luci-theme-argon --exclude=luci-app-argon-config --exclude=luci-app-nikki/' feeds.conf.default
 
 # ====================== 保留原有自定义 feeds 配置（不变） ======================
 echo -e "\n🔧 配置自定义 feeds 源..."
