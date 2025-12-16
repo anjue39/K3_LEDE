@@ -16,10 +16,7 @@ cat package/base-files/files/bin/config_generate |grep hostname=
 echo '=========Alert hostname OK!========='
 
 echo '修改路由器默认IP'
-# 精准只改 lan 接口那一行，避免误伤其他地方
-sed -i 's/"192\.168\.1\.1"/"192.168.2.1"/g' package/base-files/files/bin/config_generate
-# 或者更严谨的整行匹配（你以前用过的）
-# sed -i 's/^\s*lan) ipad=\${ipaddr:-"192\.168\.1\.1"} ;;$/lan) ipad=${ipaddr:-"192.168.2.1"} ;;/' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
 echo '=========Alert default IP OK!========='
 
 
