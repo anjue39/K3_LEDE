@@ -69,6 +69,19 @@ jobs:
         
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
+    - name: Load custom feeds
+      run: |
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
+
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
+
     # ========== 关键修改1：新增 feeds 缓存清理步骤（放在 Update feeds 前） ==========
     - name: Clean feeds cache
       run: |
@@ -78,18 +91,6 @@ jobs:
         # 清理已下载的 feeds 包缓存（可选，彻底清理）
         rm -rf package/feeds/ package/lean/*feeds*
         echo "✅ 已清理 feeds 缓存和临时文件"
-    - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
-    - name: Load custom feeds
-      run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-        chmod +x $DIY_P1_SH
-        cd openwrt
-        $GITHUB_WORKSPACE/$DIY_P1_SH
-    
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
