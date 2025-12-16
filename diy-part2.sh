@@ -11,10 +11,10 @@
 # Description: 大部分是一开始不在默认底包，feeds update和自定义添加完后才有的 后设置
 
 # 以下是你原封不动的代码（完全不用改）
-#echo '修改主机名'
-#sed -i "s/hostname='LEDE'/hostname='PHICOMM'/g" package/base-files/files/bin/config_generate
-#cat package/base-files/files/bin/config_generate |grep hostname=
-#echo '=========Alert hostname OK!========='
+echo '修改主机名'
+sed -i "s/hostname='LEDE'/hostname='PHICOMM'/g" package/base-files/files/bin/config_generate
+cat package/base-files/files/bin/config_generate |grep hostname=
+echo '=========Alert hostname OK!========='
 
 echo '修改路由器默认IP'
 sed -i 's/^\s*lan) ipad=\${ipaddr:-"192.168.1.1"} ;;$/lan) ipad=${ipaddr:-"192.168.2.1"} ;;/' package/base-files/files/bin/config_generate
