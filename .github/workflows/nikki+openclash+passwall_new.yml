@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: openclash
+name: nikki+openclash+passwall_new
 
 on:
   repository_dispatch:
