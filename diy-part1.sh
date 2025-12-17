@@ -2,17 +2,10 @@
 
 echo -e "\n===== 开始执行 diy-part1.sh ====="
 
-# ====================== 正确的 feeds 包屏蔽方式（修改 feeds.conf.default） ======================
-echo "🔧 屏蔽官方 feeds 中的重复包..."
-# 给 feeds/packages 源追加屏蔽参数
-sed -i '/src-git packages/ s/$/ --exclude=phicomm-k3screenctrl/' feeds.conf.default
-# 给 feeds/luci 源追加屏蔽参数
-sed -i '/src-git luci/ s/$/ --exclude=luci-app-openclash --exclude=luci-app-k3screenctrl --exclude=luci-theme-argon --exclude=luci-app-argon-config --exclude=luci-app-nikki/' feeds.conf.default
+# 清理旧的自定义 feeds 行（避免重复添加）
+sed -i '/^src-git openclash/d; /^src-git nikki/d' feeds.conf.default
 
-# ====================== 保留原有自定义 feeds 配置（不变） ======================
-echo -e "\n🔧 配置自定义 feeds 源..."
-sed -i '/openclash/d' feeds.conf.default
-sed -i '/nikki/d' feeds.conf.default
+# 添加自定义 feeds
 echo 'src-git openclash https://github.com/vernesong/OpenClash' >> feeds.conf.default
 echo 'src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' >> feeds.conf.default
 
