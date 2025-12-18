@@ -31,7 +31,7 @@ rm -rf package/lean/k3screenctrl 2>/dev/null
 # ====================== 3. 手动克隆高优先级包（openclash + nikki） ======================
 echo -e "\n🔧 手动克隆自定义包到 package/lean..."
 git clone --depth=1 -b dev https://github.com/vernesong/OpenClash package/lean/luci-app-openclash
-git clone --depth=1 https://github.com/xxx/luci-app-nikki package/lean/luci-app-nikki
+git clone --depth=1 https://github.com/nikkinikki-org/OpenWrt-nikki package/lean/luci-app-nikki
 
 # ====================== 4. 手动克隆高优先级包（argon + k3screenctrl） ======================
 echo -e "\n🔧 手动克隆自定义包到 package/lean..."
