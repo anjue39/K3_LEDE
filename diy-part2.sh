@@ -6,8 +6,6 @@ echo -e "\n===== 开始执行 diy-part2.sh（feeds install 后处理）=====\n"
 echo "🔧 清理 feeds 残留包..."
 # 清理 feeds 目录下的冲突包
 rm -rf feeds/packages/util/phicomm-k3screenctrl 2>/dev/null
-rm -rf feeds/openclash/luci-app-openclash 2>/dev/null   # OpenClash 实际路径（自定义 feeds）
-rm -rf feeds/nikki/luci-app-nikk 2>/dev/null  # Nikki 实际路径（自定义 feeds）
 rm -rf feeds/luci/applications/luci-app-openclash 2>/dev/null
 rm -rf feeds/luci/applications/luci-app-k3screenctrl 2>/dev/null
 rm -rf feeds/luci/themes/luci-theme-argon 2>/dev/null
@@ -30,11 +28,10 @@ rm -rf package/lean/luci-app-argon-config 2>/dev/null
 rm -rf package/lean/luci-app-nikki 2>/dev/null
 rm -rf package/lean/k3screenctrl 2>/dev/null
 
-# ====================== 3. 安装自定义 feeds 包（openclash + nikki） ======================
-echo -e "\n🔧 安装自定义 feeds 包..."
-./scripts/feeds update openclash nikki
-./scripts/feeds install -a -p openclash
-./scripts/feeds install -a -p nikki
+# ====================== 3. 手动克隆高优先级包（openclash + nikki） ======================
+echo -e "\n🔧 手动克隆自定义包到 package/lean..."
+git clone --depth=1 -b dev https://github.com/vernesong/OpenClash package/lean/luci-app-openclash
+git clone --depth=1 https://github.com/xxx/luci-app-nikki package/lean/luci-app-nikki
 
 # ====================== 4. 手动克隆高优先级包（argon + k3screenctrl） ======================
 echo -e "\n🔧 手动克隆自定义包到 package/lean..."
@@ -45,7 +42,6 @@ git clone -b 18.06 --depth=1 https://github.com/jerrykuku/luci-app-argon-config 
 # 克隆 k3screenctrl 主程序 + luci 控制界面
 git clone --depth=1 https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
 git clone --depth=1 https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
-
 
 # ====================== 5. 系统配置修改（主机名+默认IP，精准匹配） ======================
 echo -e "\n🔧 修改系统默认配置..."
@@ -59,19 +55,20 @@ sed -i 's/lan) ipad=\${ipaddr:-"192\.168\.1\.1"} ;;$/lan) ipad=${ipaddr:-"192.16
 echo "✅ 默认 LAN IP 已修改为 192.168.2.1"
 grep -E "192.168.2.1" package/base-files/files/bin/config_generate | grep -v '#'
 
-# 修改插件名字
+# 修改插件名称（保留你的配置）
+sed -i 's/"Turbo ACC 网络加速"/"网络加速"/g' `grep "Turbo ACC 网络加速" -rl ./`
+sed -i 's/"USB 打印服务器"/"打印服务"/g' `grep "USB 打印服务器" -rl ./`
+sed -i 's/"Argon 主题设置"/"Argon设置"/g' `grep "Argon 主题设置" -rl ./`
 # sed -i 's/"aMule设置"/"电驴下载"/g' `grep "aMule设置" -rl ./`
 # sed -i 's/"网络存储"/"NAS"/g' `grep "网络存储" -rl ./`
-sed -i 's/"Turbo ACC 网络加速"/"网络加速"/g' `grep "Turbo ACC 网络加速" -rl ./`
 # sed -i 's/"实时流量监测"/"流量"/g' `grep "实时流量监测" -rl ./`
 # sed -i 's/"KMS 服务器"/"KMS激活"/g' `grep "KMS 服务器" -rl ./`
 # sed -i 's/"TTYD 终端"/"命令窗"/g' `grep "TTYD 终端" -rl ./`
-sed -i 's/"USB 打印服务器"/"打印服务"/g' `grep "USB 打印服务器" -rl ./`
 # sed -i 's/"Web 管理"/"Web"/g' `grep "Web 管理" -rl ./`
 # sed -i 's/"管理权"/"改密码"/g' `grep "管理权" -rl ./`
 # sed -i 's/"带宽监控"/"监控"/g' `grep "带宽监控" -rl ./`
-sed -i 's/"Argon 主题设置"/"Argon设置"/g' `grep "Argon 主题设置" -rl ./`
 # sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
+echo "✅ 插件名称已修改完成"
 
 # ====================== 6. 更新配置（让编译系统感知变化） ======================
 echo -e "\n🔧 更新编译配置..."
