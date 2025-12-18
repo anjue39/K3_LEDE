@@ -59,14 +59,6 @@ sed -i 's/lan) ipad=\${ipaddr:-"192\.168\.1\.1"} ;;$/lan) ipad=${ipaddr:-"192.16
 echo "✅ 默认 LAN IP 已修改为 192.168.2.1"
 grep -E "192.168.2.1" package/base-files/files/bin/config_generate | grep -v '#'
 
-# ====================== 6. 更新配置（让编译系统感知变化） ======================
-echo -e "\n🔧 更新编译配置..."
-make defconfig > /dev/null 2>&1
-echo "✅ 编译配置已更新"
-
-echo -e "\n===== diy-part2.sh 执行完成 =====\n"
-
-
 # 修改插件名字
 # sed -i 's/"aMule设置"/"电驴下载"/g' `grep "aMule设置" -rl ./`
 # sed -i 's/"网络存储"/"NAS"/g' `grep "网络存储" -rl ./`
@@ -80,6 +72,15 @@ sed -i 's/"USB 打印服务器"/"打印服务"/g' `grep "USB 打印服务器" -r
 # sed -i 's/"带宽监控"/"监控"/g' `grep "带宽监控" -rl ./`
 sed -i 's/"Argon 主题设置"/"Argon设置"/g' `grep "Argon 主题设置" -rl ./`
 # sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
+
+# ====================== 6. 更新配置（让编译系统感知变化） ======================
+echo -e "\n🔧 更新编译配置..."
+make defconfig > /dev/null 2>&1
+echo "✅ 编译配置已更新"
+
+echo -e "\n===== diy-part2.sh 执行完成 =====\n"
+
+
 
 # 以下是备用自定义配置，去'#'后才会执行，非必要不添加
 
