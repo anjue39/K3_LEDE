@@ -1,23 +1,13 @@
 #!/bin/bash
 
-# 清理旧的自定义 feeds 行（避免重复添加）
-# sed -i '/^src-git openclash/d; /^src-git nikki/d' feeds.conf.default
+echo -e "\n===== 开始执行 diy-part1.sh ====="
 
-# echo '添加自定义源'
-# sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
-# sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
-# sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
-# sed -i '$a src-git small https://github.com/kenzok8/small-package' feeds.conf.default
-# sed -i '$a src-git openclash https://github.com/vernesong/OpenClash' feeds.conf.default
-# sed -i '$a src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' feeds.conf.default
-# sed -i '$a src-git ECH https://github.com/SunshineList/luci-app-ech-workers' feeds.conf.default
-# echo '=========Add a feed source OK!========='
+# 清理并添加自定义 Feed 源
+sed -i '/^src-git openclash/d; /^src-git nikki/d' feeds.conf.default
+echo 'src-git openclash https://github.com/vernesong/OpenClash' >> feeds.conf.default
+echo 'src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' >> feeds.conf.default
 
-# echo '添加jerrykuku的argon主题及设置'
-# rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
-# git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
-# git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
-# echo '=========Add argon OK!========='
+echo "✅ 自定义源添加完成"
 
 echo '移除主页跑分信息显示'
 sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
@@ -35,7 +25,7 @@ echo '=========Remove benchmark display in index OK!========='
 # 删除标准固件包，避免冲突。如果你想用k3wifi，那么就得删除BRCMFMAC_4366C0，因为k3wifi里面已经包含
 # sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
 
-echo '移除bcm53xx中的其他机型，lede最新版本适配你设置的单机型，而不是生成所有，此代码没必要了'
+# echo '移除bcm53xx中的其他机型，lede最新版本适配你设置的单机型，而不是生成所有，此代码没必要了'
 # sed -i '421,453d' target/linux/bcm53xx/image/Makefile
 # sed -i '140,412d' target/linux/bcm53xx/image/Makefile
 # sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
@@ -46,7 +36,7 @@ echo '移除bcm53xx中的其他机型，lede最新版本适配你设置的单机
 # sed -i '/define Device\/phicomm_k3/,/TARGET_DEVICES += phicomm_k3/!{ /define Device\//,/endef/d; /TARGET_DEVICES +=/d }' target/linux/bcm53xx/image/Makefile
 # sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
 # sed -n '532,538p' target/linux/bcm53xx/image/Makefile
-echo '=========Remove other devices of bcm53xx OK!========='
+# echo '=========Remove other devices of bcm53xx OK!========='
 
 # ======== 强制只编译 K3 并生成完整固件（必须用这个完整版！） ========
 #cat > target/linux/bcm53xx/image/Makefile <<'EOF'
