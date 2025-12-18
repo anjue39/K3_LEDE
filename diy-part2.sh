@@ -6,6 +6,8 @@ echo -e "\n===== 开始执行 diy-part2.sh（feeds install 后处理）=====\n"
 echo "🔧 清理 feeds 残留包..."
 # 清理 feeds 目录下的冲突包
 rm -rf feeds/packages/util/phicomm-k3screenctrl 2>/dev/null
+rm -rf feeds/openclash/luci-app-openclash 2>/dev/null   # OpenClash 实际路径（自定义 feeds）
+rm -rf feeds/nikki/luci-app-nikk 2>/dev/null  # Nikki 实际路径（自定义 feeds）
 rm -rf feeds/luci/applications/luci-app-openclash 2>/dev/null
 rm -rf feeds/luci/applications/luci-app-k3screenctrl 2>/dev/null
 rm -rf feeds/luci/themes/luci-theme-argon 2>/dev/null
@@ -44,25 +46,26 @@ git clone -b 18.06 --depth=1 https://github.com/jerrykuku/luci-app-argon-config 
 git clone --depth=1 https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
 git clone --depth=1 https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
 
-# ====================== 5. 可选：将 feeds 包迁移到 package/lean 提升优先级（如需，取消注释） ======================
-# echo -e "\n🔧 提升 feeds 包优先级..."
-# cp -rf package/feeds/openclash/* package/lean/ 2>/dev/null
-# cp -rf package/feeds/nikki/* package/lean/ 2>/dev/null
+
+# ====================== 5. 系统配置修改（主机名+默认IP，精准匹配） ======================
+echo -e "\n🔧 修改系统默认配置..."
+# 修改主机名（精准匹配，避免误伤其他行）
+sed -i 's/hostname='"'"'LEDE'"'"'/hostname='"'"'PHICOMM'"'"'/g' package/base-files/files/bin/config_generate
+echo "✅ 主机名已修改为 PHICOMM"
+grep -E "hostname=" package/base-files/files/bin/config_generate | grep -v '#'
+
+# 修改默认 LAN IP（整行精准匹配，避免改到 wan 口）
+sed -i 's/lan) ipad=\${ipaddr:-"192\.168\.1\.1"} ;;$/lan) ipad=${ipaddr:-"192.168.2.1"} ;;/g' package/base-files/files/bin/config_generate
+echo "✅ 默认 LAN IP 已修改为 192.168.2.1"
+grep -E "192.168.2.1" package/base-files/files/bin/config_generate | grep -v '#'
+
+# ====================== 6. 更新配置（让编译系统感知变化） ======================
+echo -e "\n🔧 更新编译配置..."
+make defconfig > /dev/null 2>&1
+echo "✅ 编译配置已更新"
 
 echo -e "\n===== diy-part2.sh 执行完成 =====\n"
 
-echo '修改主机名'
-sed -i "s/hostname='LEDE'/hostname='PHICOMM'/g" package/base-files/files/bin/config_generate
-cat package/base-files/files/bin/config_generate |grep hostname=
-echo '=========Alert hostname OK!========='
-
-echo '修改路由器默认IP'
-# 精准只改 lan 接口那一行，避免误伤其他地方
-sed -i 's/"192\.168\.1\.1"/"192.168.2.1"/g' package/base-files/files/bin/config_generate
-# 或者更严谨的整行匹配（你以前用过的）
-# sed -i 's/^\s*lan) ipad=\${ipaddr:-"192\.168\.1\.1"} ;;$/lan) ipad=${ipaddr:-"192.168.2.1"} ;;/' package/base-files/files/bin/config_generate
-
-echo '=========Alert default IP OK!========='
 
 # 修改插件名字
 # sed -i 's/"aMule设置"/"电驴下载"/g' `grep "aMule设置" -rl ./`
@@ -77,8 +80,6 @@ sed -i 's/"USB 打印服务器"/"打印服务"/g' `grep "USB 打印服务器" -r
 # sed -i 's/"带宽监控"/"监控"/g' `grep "带宽监控" -rl ./`
 sed -i 's/"Argon 主题设置"/"Argon设置"/g' `grep "Argon 主题设置" -rl ./`
 # sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
-
-
 
 # 以下是备用自定义配置，去'#'后才会执行，非必要不添加
 
