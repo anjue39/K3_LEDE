@@ -5,7 +5,7 @@ echo -e "\n===== 开始执行 diy-part2.sh（feeds install 后处理）=====\n"
 # ====================== 1. 清理 feeds 残留和重复包 ======================
 echo "🔧 清理 feeds 残留包..."
 # 清理 feeds 目录下的冲突包
-rm -rf feeds/packages/util/phicomm-k3screenctrl  feeds/pack
+rm -rf feeds/packages/util/phicomm-k3screenctrl 2>/dev/null
 rm -rf feeds/luci/applications/luci-app-openclash 2>/dev/null
 rm -rf feeds/luci/applications/luci-app-k3screenctrl 2>/dev/null
 rm -rf feeds/luci/themes/luci-theme-argon 2>/dev/null
