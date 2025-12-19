@@ -2,10 +2,9 @@
 
 echo -e "\n===== 开始执行 diy-part1.sh ====="
 
-# 清理并添加自定义 Feed 源
-sed -i '/^src-git openclash/d; /^src-git nikki/d' feeds.conf.default
-echo 'src-git openclash https://github.com/vernesong/OpenClash' >> feeds.conf.default
-echo 'src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' >> feeds.conf.default
+# 添加自定义 Feed 源
+sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
+sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
 
 echo "✅ 自定义源添加完成"
 
