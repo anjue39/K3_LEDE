@@ -3,7 +3,7 @@ set -e  # 出错立即终止，便于定位问题
 
 # ====================== 脚本配置区（根据你的实际路径修改） ======================
 # LEDE 源码根目录（本地路径，示例：~/lede）
-LEDES_DIR="$HOME/lede1"
+LEDES_DIR="$HOME/lede"
 # DIY 脚本文件名（默认和此脚本同目录）
 DIY_P1="diy-part1.sh"
 DIY_P2="diy-part2.sh"
