@@ -5,6 +5,7 @@ echo "🔧 正在修改系统默认配置..."
 
 # A. 修改主机名（LEDE -> PHICOMM）
 sed -i 's/hostname='"'"'OpenWrt'"'"'/hostname='"'"'PHICOMM'"'"'/g' package/base-files/files/bin/config_generate
+sed -i 's/hostname='"'"'LEDE'"'"'/hostname='"'"'PHICOMM'"'"'/g' package/base-files/files/bin/config_generate
 echo "✅ 主机名已修改为: PHICOMM"
 
 # B. 修改默认 LAN IP（192.168.1.1 -> 192.168.2.1）
