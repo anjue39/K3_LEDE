@@ -32,12 +32,12 @@ echo '=========Add k3screen plug OK!========='
 # sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
 
 echo '移除bcm53xx中的其他机型，lede最新版本适配你设置的单机型，而不是生成所有，此代码没必要了'
-sed -i '421,453d' target/linux/bcm53xx/image/Makefile
-sed -i '140,412d' target/linux/bcm53xx/image/Makefile
+# sed -i '421,453d' target/linux/bcm53xx/image/Makefile
+# sed -i '140,412d' target/linux/bcm53xx/image/Makefile
 # sed -i 's/$(USB3_PACKAGES) k3screenctrl/luci-app-k3screenctrl/g' target/linux/bcm53xx/image/Makefile
 # 从源码最根源改 K3 的 DEVICE_PACKAGES（你测试有效的版本）
 # 下面这行指定编译固件封装锁死的插件！
-# sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac k3wifi $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
+sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac k3wifi $(USB3_PACKAGES) k3screenctrl#' target/linux/bcm53xx/image/Makefile
 # 下面这行只生成k3这个设备的固件！
 # sed -i '/define Device\/phicomm_k3/,/TARGET_DEVICES += phicomm_k3/!{ /define Device\//,/endef/d; /TARGET_DEVICES +=/d }' target/linux/bcm53xx/image/Makefile
 # sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
