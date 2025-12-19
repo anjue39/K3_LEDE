@@ -20,13 +20,13 @@ git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/le
 echo '=========Add argon OK!========='
 
 # ================以下备用，多以失效，按顺序最上为最有效====================
-echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
+# echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
 # 但好像用不到了，尤其更新内核后，lede最近更新了一个phicomm-k3screenctrl，等同于k3screenctl和luci-app-k3screenctrl的合体
 # menuconfig后台luci里默认勾选luci-app-k3screenctrl，utilties就自动锁死勾选了配套的phicomm-k3screenctrl，这才是配套的组合，编译才会成功
-rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
-git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
-git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
-echo '=========Add k3screen plug OK!========='
+# rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
+# git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
+# git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
+# echo '=========Add k3screen plug OK!========='
 
 # 删除标准固件包，避免冲突。如果你想用k3wifi，那么就得删除BRCMFMAC_4366C0，因为k3wifi里面已经包含
 # sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
