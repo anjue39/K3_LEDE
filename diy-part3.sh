@@ -8,11 +8,11 @@ sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
 
 echo "✅ 自定义源添加完成"
 
-echo '添加jerrykuku的argon主题及设置'
-rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
-git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
-git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
-echo '=========Add argon OK!========='
+# echo '添加jerrykuku的argon主题及设置'
+# rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
+# git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
+# git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
+# echo '=========Add argon OK!========='
 
 echo '移除主页跑分信息显示'
 sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
