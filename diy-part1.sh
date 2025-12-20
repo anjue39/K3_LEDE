@@ -13,11 +13,11 @@ sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf
 echo "✅ 自定义源添加完成"
 
 
-echo '添加jerrykuku的argon主题及设置'
-rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
-git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
-git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
-echo '=========Add argon OK!========='
+# echo '添加jerrykuku的argon主题及设置'
+# rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
+# git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
+# git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
+# echo '=========Add argon OK!========='
 
 # ================以下备用，多以失效，按顺序最上为最有效====================
 # echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
