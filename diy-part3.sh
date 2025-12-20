@@ -14,9 +14,9 @@ echo "✅ 自定义源添加完成"
 # git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
 # echo '=========Add argon OK!========='
 
-echo '移除主页跑分信息显示'
-sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
-echo '=========Remove benchmark display in index OK!========='
+# echo '移除主页跑分信息显示'
+# sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
+# echo '=========Remove benchmark display in index OK!========='
 
 
 # ================以下备用，多以失效，按顺序最上为最有效====================
