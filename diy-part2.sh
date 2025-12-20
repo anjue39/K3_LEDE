@@ -4,12 +4,12 @@
 echo "🔧 正在修改系统默认配置..."
 
 # A. 修改主机名（LEDE -> PHICOMM）
-sed -i 's/hostname='"'"'OpenWrt'"'"'/hostname='"'"'PHICOMM'"'"'/g' package/base-files/files/bin/config_generate
-sed -i 's/hostname='"'"'LEDE'"'"'/hostname='"'"'PHICOMM'"'"'/g' package/base-files/files/bin/config_generate
-echo "✅ 主机名已修改为: PHICOMM"
+sed -i 's/LEDE/PHICOMM/g' package/base-files/files/bin/config_generate
+sed -i 's/LEDE/PHICOMM/g' package/lean/default-settings/files/zzz-default-settings
+echo "✅ 主机名已全局修改为 PHICOMM"
 
 # B. 修改默认 LAN IP（192.168.1.1 -> 192.168.2.1）
-sed -i 's/lan) ipad=\${ipaddr:-"192\.168\.1\.1"} ;;$/lan) ipad=${ipaddr:-"192.168.2.1"} ;;/g' package/base-files/files/bin/config_generate
+sed -i 's/192\.168\.1\.1/192.168.2.1/g' package/base-files/files/bin/config_generate
 echo "✅ 默认 LAN IP 已修改为: 192.168.2.1"
 
 # C. 修改插件名称
