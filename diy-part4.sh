@@ -4,7 +4,6 @@
 echo "🔧 正在修改系统默认配置..."
 
 # A. 修改主机名（LEDE -> PHICOMM）
-echo "🔧 正在修改主机名..."
 sed -i 's/LEDE/PHICOMM/g' package/base-files/files/bin/config_generate
 sed -i 's/LEDE/PHICOMM/g' package/lean/default-settings/files/zzz-default-settings
 echo "✅ 主机名已全局修改为 PHICOMM"
