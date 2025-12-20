@@ -1,10 +1,12 @@
 #!/bin/bash
 
  
-# ====================== 清理 phicomm-k3screenctrl ======================
-echo "🔧 正在执行深度清理phicomm-k3screenctrl，防止包冲突..."
+# ====================== 清理 可能重复添加或冲突的包 ======================
+echo "🔧 正在执行深度清理，防止包冲突..."
 rm -rf feeds/packages/util/phicomm-k3screenctrl 2>/dev/null
+rm -rf feeds/luci/applications/luci-app-k3screenctrl 2>/dev/null
 rm -rf package/feeds/packages/phicomm-k3screenctrl 2>/dev/null
+rm -rf package/feeds/luci/luci-app-k3screenctrl 2>/dev/null
 
 # ====================== 1. 系统配置修改 ======================
 echo "🔧 正在修改系统默认配置..."
