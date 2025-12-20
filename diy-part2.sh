@@ -11,14 +11,14 @@ rm -rf package/feeds/luci/luci-app-k3screenctrl 2>/dev/null
 echo "🔧 正在修改系统默认配置..."
 
 # A. 修改主机名（LEDE -> PHICOMM）
-sed -i '/exit 0/i uci set system.@system[-1].hostname=\'PHICOMM\'' package/lean/default-settings/files/zzz-default-settings
-sed -i '/exit 0/i uci commit system' package/lean/default-settings/files/zzz-default-settings
+sed -i "/exit 0/i uci set system.@system[-1].hostname='PHICOMM'" package/lean/default-settings/files/zzz-default-settings
+sed -i "/exit 0/i uci commit system" package/lean/default-settings/files/zzz-default-settings
 echo "✅ 主机名已修改为 PHICOMM"
 
 # B. 修改默认 LAN IP（192.168.1.1 -> 192.168.2.1）
-sed -i '/exit 0/i uci set network.lan.ipaddr=\'192.168.2.1\'' package/lean/default-settings/files/zzz-default-settings
-sed -i '/exit 0/i uci commit network' package/lean/default-settings/files/zzz-default-settings
-echo "✅ 默认 LAN IP 已修改为 192.168.2.1"
+sed -i "/exit 0/i uci set network.lan.ipaddr='192.168.2.1'" package/lean/default-settings/files/zzz-default-settings
+sed -i "/exit 0/i uci commit network" package/lean/default-settings/files/zzz-default-settings
+echo "✅ 默认 LAN IP 已修改为: 192.168.2.1"
 
 # C. 修改插件名称
 sed -i 's/"Turbo ACC 网络加速"/"网络加速"/g' `grep "Turbo ACC 网络加速" -rl ./` 2>/dev/null
