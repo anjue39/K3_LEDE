@@ -16,13 +16,13 @@ echo '添加jerrykuku的argon主题及设置'
 rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
 git clone -b https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
 git clone -b https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
-echo '=========Add argon OK!========='
+echo "✅ Add argon主题 完成"
 
 echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
 rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
 git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
 git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
-echo '=========Add k3screen plug OK!========='
+echo "✅ Add k3screen plug OK!"
 
 # 删除标准固件包，避免冲突。如果你想用k3wifi，那么就得删除BRCMFMAC_4366C0，因为k3wifi里面已经包含
 # sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
@@ -38,11 +38,11 @@ sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAG
 # sed -i '/define Device\/phicomm_k3/,/TARGET_DEVICES += phicomm_k3/!{ /define Device\//,/endef/d; /TARGET_DEVICES +=/d }' target/linux/bcm53xx/image/Makefile
 # sed -i '/phicomm_k3/a\  DEVICE_PACKAGES += k3screenctrl luci-app-k3screenctrl luci-app-argon-config' target/linux/bcm53xx/image/Makefile
 # sed -n '532,538p' target/linux/bcm53xx/image/Makefile
-echo '=========Remove other devices of bcm53xx OK!========='
+echo "✅ Remove other devices of bcm53xx OK!"
 
 echo '移除主页跑分信息显示'
 sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
-echo '=========Remove benchmark display in index OK!========='
+echo "✅ Remove benchmark display in index OK!"
 
 echo -e "\n===== diy-part1.sh 执行完成 =====\n"
 
