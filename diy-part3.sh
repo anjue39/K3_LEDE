@@ -19,7 +19,7 @@ echo "✅ 自定义源添加完成"
 # echo "✅ Add argon主题 完成"
 
 # echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
-rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
+rm -rf package/lean/k3screenctrl
 # git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
 # git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
 # echo "✅ Add k3screen plug OK!"
