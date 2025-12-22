@@ -1,7 +1,24 @@
-#!/bin/bash
+#!/bin/bash#
+======================1. 深度清理：防止包冲突 ======================
+echo "🔧 正在执行深度清理，防止包冲突..."
 
+# A. 清理 feeds 源码目录中的冲突项（干掉官方或聚合源里的旧包）
+rm -rf feeds/packages/util/phicomm-k3screenctrl 2>/dev/null
+rm -rf feeds/luci/applications/luci-app-k3screenctrl 2>/dev/null
 
-# ====================== 3. 系统配置修改 ======================
+# B. 清理 package/feeds 下的软链接（彻底抹除 menuconfig 旧索引）
+rm -rf package/feeds/packages/phicomm-k3screenctrl 2>/dev/null
+rm -rf package/feeds/luci/luci-app-k3screenctrl 2>/dev/null
+
+# C. 清理 package/lean 中的旧包（防止手动克隆冲突）
+rm -rf package/lean/k3screenctrl 2>/dev/null
+rm -rf package/lean/luci-app-k3screenctrl 2>/dev/null
+
+# ====================== 2. 手动克隆高优先级包 ======================
+echo "🔧 手动克隆自定义包到 package/lean..."
+# 克隆 k3screenctrl 屏幕控制插件
+git clone --depth=1 https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
+git clone --depth=1 https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl# ====================== 3. 系统配置修改 ======================
 echo "🔧 正在修改系统默认配置..."
 
 # A. 修改主机名（LEDE -> PHICOMM）
