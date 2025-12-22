@@ -18,7 +18,9 @@ rm -rf package/lean/luci-app-k3screenctrl 2>/dev/null
 echo "🔧 手动克隆自定义包到 package/lean..."
 # 克隆 k3screenctrl 屏幕控制插件
 git clone --depth=1 https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
-git clone --depth=1 https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl# ====================== 3. 系统配置修改 ======================
+git clone --depth=1 https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
+
+# ====================== 3. 系统配置修改 ======================
 echo "🔧 正在修改系统默认配置..."
 
 # A. 修改主机名（LEDE -> PHICOMM）
