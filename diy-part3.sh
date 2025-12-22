@@ -18,11 +18,11 @@ echo "✅ 自定义源添加完成"
 # git clone -b https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
 # echo "✅ Add argon主题 完成"
 
-#echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
+echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
 rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
-#git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
-#git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
-#echo "✅ Add k3screen plug OK!"
+git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
+git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
+echo "✅ Add k3screen plug OK!"
 
 # 删除标准固件包，避免冲突。如果你想用k3wifi，那么就得删除BRCMFMAC_4366C0，因为k3wifi里面已经包含
 # sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
