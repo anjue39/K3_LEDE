@@ -58,7 +58,7 @@ echo "✅ kernel 已锁定为 5.15"
 # 2. 替换无线固件为 AC88U 48260 版（xiangfeidexiaohuo 仓库，最佳性能）
 echo "→ 替换无线固件为 AC88U 48260 版"
 wget -O package/lean/k3-firmware/files/brcmfmac4366c-pcie.bin \
-    https://raw.githubusercontent.com/xiangfeidexiaohuo/Phicomm-K3_Wireless-Firmware/master/brcmfmac4366c-pcie.bin_ac88.48260
+    https://raw.githubusercontent.com/xiangfeidexiaohuo/Phicomm-K3_Wireless-Firmware/master/brcmfmac4366c-pcie.bin_69027
 echo "✅ 无线固件已替换（无需手动 mkdir，wget 会自动处理目录）"
 
 # 3. 首次开机自动解锁最大发射功率 31 dBm（2.4G + 5G）
