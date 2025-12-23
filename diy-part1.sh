@@ -44,6 +44,29 @@ echo '移除主页跑分信息显示'
 sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
 echo "✅ Remove benchmark display in index OK!"
 
+# ==========================================
+# Phicomm K3 专用优化脚本（diy-part1.sh）
+# ==========================================
+
+echo "🔧 开始 Phicomm K3 低版本5.4内核专用优化..."
+
+# 首次开机自动解锁最大发射功率 31 dBm（2.4G + 5G）
+echo "→ 添加首次开机功率解锁脚本"
+cat > package/base-files/files/etc/uci-defaults/99-k3-txpower <<EOF
+#!/bin/sh
+# K3 无线最大功率解锁（31 dBm）
+uci set wireless.radio0.txpower='28'   # 2.4G
+uci set wireless.radio1.txpower='28'   # 5G
+uci commit wireless
+wifi reload
+rm -f \$0   # 执行完后自动删除本脚本
+EOF
+chmod +x package/base-files/files/etc/uci-defaults/99-k3-txpower
+echo "✅ 功率解锁脚本已添加（首次开机自动执行）"
+
+echo "🎉 K3 优化全部完成！"
+echo "   - 发射功率: 28 dBm（增强平衡）"
+
 echo -e "\n===== diy-part1.sh 执行完成 =====\n"
 
 # ================以下备用，多以失效，按顺序最上为最有效====================
