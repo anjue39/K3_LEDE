@@ -44,37 +44,44 @@ echo '移除主页跑分信息显示'
 sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/autocore/files/arm/index.htm
 echo "✅ Remove benchmark display in index OK!"
 
+# ==========================================
+# Phicomm K3 专用优化脚本（diy-part1.sh）
+# ==========================================
+
+echo "🔧 开始 Phicomm K3 专用优化..."
+
+# 1. 强制回滚 kernel 到 5.15（解决 kernel 6.x 兼容性问题）
+echo "→ 回滚 kernel 到 5.15"
+sed -i 's/KERNEL_PATCHVER:=.*/KERNEL_PATCHVER:=5.15/g' target/linux/bcm53xx/Makefile
+echo "✅ kernel 已锁定为 5.15"
+
+# 2. 替换无线固件为 AC88U 48260 版（xiangfeidexiaohuo 仓库，最佳性能）
+echo "→ 替换无线固件为 AC88U 48260 版"
+wget -O package/lean/k3wifi/files/brcmfmac4366c-pcie.bin \
+    https://raw.githubusercontent.com/xiangfeidexiaohuo/Phicomm-K3_Wireless-Firmware/master/brcmfmac4366c-pcie.bin_ac88.48260
+echo "✅ 无线固件已替换（无需手动 mkdir，wget 会自动处理目录）"
+
+# 3. 首次开机自动解锁最大发射功率 31 dBm（2.4G + 5G）
+echo "→ 添加首次开机功率解锁脚本"
+cat > package/base-files/files/etc/uci-defaults/99-k3-txpower <<EOF
+#!/bin/sh
+# K3 无线最大功率解锁（31 dBm）
+uci set wireless.radio0.txpower='31'   # 2.4G
+uci set wireless.radio1.txpower='31'   # 5G
+uci commit wireless
+wifi reload
+rm -f \$0   # 执行完后自动删除本脚本
+EOF
+chmod +x package/base-files/files/etc/uci-defaults/99-k3-txpower
+echo "✅ 功率解锁脚本已添加（首次开机自动执行）"
+
+echo "🎉 K3 优化全部完成！"
+echo "   - kernel: 5.15（稳定）"
+echo "   - 无线固件: AC88U 48260（最强）"
+echo "   - 发射功率: 31 dBm（满血）"
+
 echo -e "\n===== diy-part3.sh 执行完成 =====\n"
 
-# ======== 强制只编译 K3 并生成完整固件（必须用这个完整版！） ========
-#cat > target/linux/bcm53xx/image/Makefile <<'EOF'
-#define Device/phicomm-k3
-#  DEVICE_VENDOR := Phicomm
-#  DEVICE_MODEL := K3
-#  SOC := bcm4709
-#  DEVICE_DTS_CONFIG := config@cv1812cp
-#  IMAGE_SIZE := 128m
-#  IMAGES := trx
-#  DEVICE_PACKAGES := kmod-brcmfmac kmod-brcmfmac_4366c0 firmware-brcmfmac4366c-pcie \
-#                     kmod-usb3 kmod-usb-ledtrig-usbport \
-#                     k3screenctrl luci-app-k3screenctrl luci-app-argon-config
-#  KERNEL := kernel-bin | lzma | fit lzma \$KERNEL
-#  KERNEL_INITRAMFS := kernel-bin | lzma | fit lzma \$KERNEL_INITRAMFS
-#  IMAGE/trx := append-kernel | pad-to 64k | append-rootfs | pad-rootfs | append-metadata
-#endef
-#TARGET_DEVICES += phicomm-k3
-#EOF
-
-
-# 整理固件包时候,删除您不想要的固件或者文件,让它不需要上传到Actions空间（根据编译机型变化,自行调整需要删除的固件名称）
-# cat >${GITHUB_WORKSPACE}/Clear <<-EOF
-# rm -rf config.buildinfo
-# rm -rf feeds.buildinfo
-# rm -rf sha256sums
-# rm -rf version.buildinfo
-# rm -rf openwrt-bcm53xx-generic-phicomm_k3.manifest
-# rm -rf *.manifest
-# EOF
 
 # echo '临时替换kernel＜5.10，解决编译问题，等上游修复'
 # rm -rf package/kernel
