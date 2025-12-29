@@ -37,7 +37,7 @@ echo "🔧 开始 Phicomm K3 专用优化..."
 echo "→ 添加首次开机功率解锁脚本"
 cat > package/base-files/files/etc/uci-defaults/99-k3-txpower <<EOF
 #!/bin/sh
-# K3 无线最大功率解锁（31 dBm）
+# K3 无线最大功率解锁（31 dBm，这里平衡一下取28）
 uci set wireless.radio0.txpower='28'   # 2.4G
 uci set wireless.radio1.txpower='28'   # 5G
 uci commit wireless
