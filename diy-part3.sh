@@ -33,11 +33,11 @@ sed -i 's/ <%=luci.sys.exec("cat \/etc\/bench.log") or ""%>//g' package/lean/aut
 echo "✅ Remove benchmark display in index OK!"
 
 echo "🔧 开始 Phicomm K3 专用优化..."
-# 首次开机自动解锁最大发射功率 31 dBm（2.4G + 5G）
+# 首次开机自动解锁平衡增强发射功率 28 dBm（2.4G + 5G）
 echo "→ 添加首次开机功率解锁脚本"
 cat > package/base-files/files/etc/uci-defaults/99-k3-txpower <<EOF
 #!/bin/sh
-# K3 无线最大功率解锁（31 dBm，这里平衡一下取28）
+# K3 无线最大功率解锁（31 dBm）
 uci set wireless.radio0.txpower='28'   # 2.4G
 uci set wireless.radio1.txpower='28'   # 5G
 uci commit wireless
