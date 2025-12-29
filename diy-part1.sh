@@ -15,11 +15,11 @@ git clone -b https://github.com/jerrykuku/luci-theme-argon package/lean/luci-the
 git clone -b https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
 echo "✅ Add argon主题 完成"
 
-# echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
-# rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
-# git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
-# git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
-# echo "✅ Add k3screen plug OK!"
+echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
+rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
+git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
+git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
+echo "✅ Add k3screen plug OK!"
 
 echo '移除bcm53xx中的其他机型'
 sed -i '/define Device\/phicomm_k3/,/endef/s#DEVICE_PACKAGES := .*#DEVICE_PACKAGES := $(IEEE8021X) kmod-brcmfmac k3wifi $(USB3_PACKAGES)#' target/linux/bcm53xx/image/Makefile
