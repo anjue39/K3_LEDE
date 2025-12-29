@@ -7,22 +7,19 @@ echo '添加自定义源'
 sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
 sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
 # sed -i '$a src-git small https://github.com/kenzok8/small-package' feeds.conf.default
-# echo 'src-git openclash https://github.com/vernesong/OpenClash' >> feeds.conf.default
-# echo 'src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki' >> feeds.conf.default
-# sed -i '$a src-git ECH https://github.com/SunshineList/luci-app-ech-workers' feeds.conf.default
 echo "✅ 自定义源添加完成"
 
-# echo '添加jerrykuku的argon主题及设置'
-# rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
-# git clone -b https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
-# git clone -b https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
-# echo "✅ Add argon主题 完成"
+echo '添加jerrykuku的argon主题及设置'
+rm -rf package/lean/luci-theme-argon package/lean/luci-app-argon-config  
+git clone -b https://github.com/jerrykuku/luci-theme-argon package/lean/luci-theme-argon
+git clone -b https://github.com/jerrykuku/luci-app-argon-config package/lean/luci-app-argon-config
+echo "✅ Add argon主题 完成"
 
-# echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
-# rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
-# git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
-# git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
-# echo "✅ Add k3screen plug OK!"
+echo '拉最新最强的 yangxu52 屏幕插件（覆盖官方旧版）'
+rm -rf package/lean/k3screenctrl package/lean/luci-app-k3screenctrl
+git clone https://github.com/yangxu52/k3screenctrl_build.git package/lean/k3screenctrl
+git clone https://github.com/yangxu52/luci-app-k3screenctrl.git package/lean/luci-app-k3screenctrl
+echo "✅ Add k3screen plug OK!"
 
 # 删除标准固件包，避免冲突。如果你想用k3wifi，那么就得删除BRCMFMAC_4366C0，因为k3wifi里面已经包含
 # sed -i 's/\$(BRCMFMAC_4366C0)//g' target/linux/bcm53xx/image/Makefile
@@ -51,8 +48,6 @@ chmod +x package/base-files/files/etc/uci-defaults/99-k3-txpower
 echo "✅ 功率解锁脚本已添加（首次开机自动执行）"
 
 echo "🎉 K3 优化全部完成！"
-echo "   - kernel: 5.15（稳定）"
-echo "   - 无线固件: AC88U 48260（最强）"
-echo "   - 发射功率: 31 dBm（满血）"
+echo "   - 发射功率: 28 dBm（平衡加强）"
 
 echo -e "\n===== diy-part3.sh 执行完成 =====\n"
