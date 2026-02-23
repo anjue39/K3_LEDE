@@ -1,7 +1,7 @@
 #
 # https://github.com/P3TERX/Actions-OpenWrt
 #
-# File: .github/workflows/openwrt-bulder.yml
+# File: .github/workflows/openwrt-builder.yml  ← 注意文件名修正为正确拼写（原为 bulder，应为 builder）
 # Description: Build OpenWrt using GitHub Actions
 #
 # Copyright (c) 2019-2024 P3TERX <https://p3terx.com>
@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: openclash
+name: openclash   # 工作流名称，可根据需要改为更具描述性的名字
 
 on:
   repository_dispatch:
@@ -18,8 +18,8 @@ on:
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
-  SOURCE_COMMIT: f8b9349cb8e1722bde2730bf23236e7310319314   #无问题5.4内核稳定版本 ← 如果想用最新版，直接注释或删掉这行或留空即可
-  # SOURCE_COMMIT: ''   # 这样写就是强制用最新版
+  SOURCE_COMMIT: f8b9349cb8e1722bde2730bf23236e7310319314   # 无问题5.4内核稳定版本
+  # SOURCE_COMMIT: ''   # 如果留空或注释掉此行，将强制使用最新 master 分支
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: openclash.config
   DIY_P1_SH: diy-part1.sh
@@ -41,6 +41,7 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
+        # 清理不必要的软件源、dotnet、android 等占用空间的内容
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
         sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
@@ -50,27 +51,41 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
+    # 新增步骤：彻底清理上一次构建的残留，确保每次都是全新环境
+    - name: Clean previous build & Prepare workdir
+      run: |
+        echo "开始清理旧的工作目录，防止旧文件、旧缓存污染本次编译"
+        sudo rm -rf /workdir/openwrt || true
+        sudo rm -rf /workdir/lede*   || true
+        # 显示磁盘使用情况，便于调试
+        df -hT /workdir
+        echo "清理完成，准备全新下载源码"
+
+    # 修改后的克隆步骤：更健壮的处理 commit 和 master 两种情况
     - name: Clone source code
       working-directory: /workdir
       run: |
         df -hT $PWD
         
-        # 如果 SOURCE_COMMIT 为空或未定义，则克隆最新版（master）
         if [ -z "${{ env.SOURCE_COMMIT }}" ]; then
-          echo "SOURCE_COMMIT 未设置，使用最新版（master）"
+          echo "SOURCE_COMMIT 未设置，使用最新 master 分支"
           git clone --depth=1 ${{ env.REPO_URL }} openwrt
         else
-          echo "使用指定 commit: ${{ env.SOURCE_COMMIT }}"
-          # 下载指定 commit 的 tarball（最快、无历史）
-          curl -L https://github.com/coolsnowwolf/lede/archive/${{ env.SOURCE_COMMIT }}.tar.gz | tar -xz
-          # 解压后目录名为 lede-<sha>，统一重命名为 openwrt
-          mv lede-${{ env.SOURCE_COMMIT }} openwrt
+          echo "使用指定的 commit: ${{ env.SOURCE_COMMIT }}"
+          # 使用 tarball 方式下载指定 commit，最快且不带历史记录
+          curl -L "https://github.com/coolsnowwolf/lede/archive/${{ env.SOURCE_COMMIT }}.tar.gz" -o source.tar.gz
+          tar -xzf source.tar.gz
+          # 解压后的目录名可能是 lede-<commit> 或其他，统一重命名为 openwrt
+          mv lede-* openwrt 2>/dev/null || mv lede openwrt 2>/dev/null || { echo "目录重命名失败"; exit 1; }
+          rm -f source.tar.gz
         fi
         
+        # 创建软链接，让后续步骤能通过 $GITHUB_WORKSPACE/openwrt 访问
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Load custom feeds
       run: |
+        # 如果仓库根目录有自定义 feeds.conf.default，则覆盖
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
         chmod +x $DIY_P1_SH
         cd openwrt
@@ -84,6 +99,7 @@ jobs:
 
     - name: Load custom configuration
       run: |
+        # 移动自定义文件和 .config
         [ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x $DIY_P2_SH
@@ -94,8 +110,12 @@ jobs:
       id: package
       run: |
         cd openwrt
+        # 如果你希望每次都强制重新下载所有软件包（最干净但最慢），可取消下面这行注释
+        # rm -rf dl/*
+        
         make defconfig
         make download -j8
+        # 清理损坏或 0 大小的下载文件
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
@@ -103,9 +123,11 @@ jobs:
       id: compile
       run: |
         cd openwrt
-        echo -e "$(nproc) thread compile"
+        echo "使用 $(nproc) 线程编译"
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "status=success" >> $GITHUB_OUTPUT
+        
+        # 提取设备名称，用于 artifact/release 命名
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
@@ -143,8 +165,7 @@ jobs:
       run: |
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
-        [ ${UPLOAD_GOFILE} = true && ${{ steps.gofile.outputs.url }} ] && echo "🔗 [GoFile](${{ steps.gofile.outputs.url }})" >> release.txt
-
+        # 如果后面有 gofile 等上传，可在这里添加链接（当前代码中缺少 gofile 步骤，已注释相关逻辑）
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
